@@ -45,30 +45,32 @@ Each "procX" keyword contains useful information regarding each process, such as
 Descripion of Chain of Events for the Edelweiss Implementation
 --------------------------------------------------------------
 
-This section describes the full chain of events and the Python scripts used. *One thing to note is the DBProcess class. I wrote this class thinking that it might be part of an interface to the framework, but it was never completed. Right now it looks a little weird because all it does is wraps around couchdbkit, which is already an interface to the CouchDB API*:
-
+This section describes the full chain of events and the Python scripts used. *One thing to note is the DBProcess class. I wrote this class thinking that it might be part of an interface to the framework, but it was never completed. Right now it looks a little weird because all it does is wrap around couchdbkit, which is already an wrapper interface to the CouchDB API*.
 
 -1. Ideally, the DAQ would write a meta-data doc to the CouchDB 'datadb' when the raw data file is opened and data is being written to disk. Upon completion of data acquisition, the DAQ would updated the database document's "status" keyword to "closed". This particular step has not yet been implemented in Edelweiss. Instead, there are a few Python scripts that search the local directory structure in Modane, find raw DAQ files that are ready for processing and then create the meta-data docs and place them on the CouchDB 'datadb' database. These are found in the "sambaToCouch" directory. All of these scripts run in Modane on a computer near to the DAQ.
 
 
-0. The python script "pollProc0.py" is executed and continuously runs in the background on a computer in Modane. It waits for a feed from the local CouchDB via the "newproc0" filter. When a new document shows up in 'datadb' with 'status == closed', which is done in step "-1", the callback function in "pollProc0.py" is called. The callback function is "runProc0.py". This script grabs the results from the "proc0" mapReduce view (line 33) and for each data file it
-	a. updates "status = "proc 0 in progress" (line 39)
+0. The python script "pollProc0.py" is executed and continuously runs in the background on a computer in Modane. It waits for a feed from the local CouchDB via the "newproc0" filter. When a new document shows up in 'datadb' with 'status == closed', which is done in step "-1", the callback function in "pollProc0.py" is called. The callback function is "runProc0.py". The runProc0.py script grabs the results from the "proc0" mapReduce view (line 33) and for each data file it
+
+	a. updates "status" = "proc 0 in progress" (line 39)
 	b. calls the script to secure-copy the raw data file to Lyon (line 42). (scpToSps.py)
 	c. adds the "proc0" key to the document (lines 45 - 59)
 	d. sets the "status" key to either "good" or "failed" 
 	e. updates the document to the database
 
 
-1. The python script "pollRemoteProcs.py" is executed and continuously runs in the background on the same computer in Modane. It waits for a feed from the local CouchDB via the "statusgood" filter, which indicates when a document is updated in the database with "status == good". (For example, when proc0 successfully transfers a raw data file to Lyon.) Upon this happening, it executes its callback function "remoterun.py". *yes, this python script is dangerous because it has a password in plain text.* This python script logs into the Computing Cluster machine in Lyon and executes the remoteHook.sh script. This remoteHook.sh script (*also dangerous*) can be used to execute all other down-stream processes in the processing chain.
+1. The python script "pollRemoteProcs.py" is executed and continuously runs in the background on the same computer in Modane. It waits for a feed from the local CouchDB via the "statusgood" filter, which indicates when a document is updated in the database with "status == good". (For example, when runProc0.py successfully transfers a raw data file to Lyon.) Upon this happening, it executes its callback function "remoterun.py". *yes, this python script is dangerous because it has a password in plain text.* This python script logs into the Computing Cluster machine in Lyon and executes the remoteHook.sh script. This remoteHook.sh script (*also dangerous*) can be used to execute all other down-stream processes in the processing chain.
 
 
 2. The remoteHook.sh script calls the batchRunProc1.py and batchRunProc2.py scripts. Each of these scripts
+
 	a. grab the results from the "procX" mapReduce view
 	b. updates the "status" to "in queue" for each document
 	c. submit jobs to the CC batch system to run the python scripts runProc1.py and runProc2.py, respectively. 
 
 
 The runProcX.py scripts work very similary to the runProc0.py script described above. However, these scripts are given the doc _id from the batchRunProcX.py script for each document that needs to be processed rather than finding the document with a mapReduce view. For each document _id the script
+
 	a. grabs the document and updates "status" to "in progress"
 	b. calls the processing code for each data file
 	c. records the meta-data for the process in a "procX" keyword
