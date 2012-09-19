@@ -31,13 +31,13 @@ MetaData Doc KeyWords
 
 The entire process is driven by the existence and values of particular keywords in the CouchDB docs. These keywords are "status" and "procX" where X = 0, 1, 2, ...  Additionally, there is a "batchjob" keyword that is attached to the docs to record useful information regarding the submission of batch jobs for that data, such as the process that was run, the batch job number, the location of the standard Out and standard Err from the batch job, and date / time. 
 
-The value of "status" can be "closed", "good", "bad", "queued", "proc X in progress" or "failed". The meaning of these values are
-* closed = the DAQ system (or equivalent script) has closed the data file and is ready for processing
-* good = the data file is ready for the next step in the processing chain
-* bad = something bad happened
-* queued = the process has queued in the batch system in Lyon and is waiting
-* proc X in progress = the process is running 
-* failed = a process failed
+The value of "status" can be "closed", "good", "bad", "proc X queued", "proc X in progress" or "failed". The meaning of these values are
+:closed: the DAQ system (or equivalent script) has closed the data file and is ready for processing
+:good: the data file is ready for the next step in the processing chain
+:bad: something bad happened
+:proc X queued: the process has queued in the batch system in Lyon and is waiting
+:proc X in progress: the process is running 
+:failed: a process failed
 
 Each "procX" keyword contains useful information regarding each process, such as the script or program that was called, the batch process job number if it was called on the batch system, the date / time, the computing node on which the process ran, and the full path of the output data file.
 
@@ -45,8 +45,17 @@ Each "procX" keyword contains useful information regarding each process, such as
 Descripion of Chain of Events for the Edelweiss Implementation
 --------------------------------------------------------------
 
-This section describes the full chain of events and the Python scripts used. 
+This section describes the full chain of events and the Python scripts used. *One thing to note is the DBProcess class. I wrote this class thinking that it might be part of an interface to the framework, but it was never completed. Right now it looks a little weird because all it does is wraps around couchdbkit, which is already an interface to the CouchDB API*:
 
-1. Ideally, the DAQ would write a meta-data doc to the CouchDB 'datadb' when the raw data file is opened and data is being written to disk. Upon completion of data acquisition, the DAQ would updated the database document's "status" keyword to "closed". This particular step has not yet been implemented in Edelweiss. Instead, there are a few Python scripts that search the local directory structure, find raw DAQ files that are ready for processing and then create the meta-data docs and place them on the CouchDB 'datadb' database. These are found in the "sambaToCouch" directory.
+-1. Ideally, the DAQ would write a meta-data doc to the CouchDB 'datadb' when the raw data file is opened and data is being written to disk. Upon completion of data acquisition, the DAQ would updated the database document's "status" keyword to "closed". This particular step has not yet been implemented in Edelweiss. Instead, there are a few Python scripts that search the local directory structure, find raw DAQ files that are ready for processing and then create the meta-data docs and place them on the CouchDB 'datadb' database. These are found in the "sambaToCouch" directory.
+
+0. The python script "pollProc0.py" is executed and continuously runs in the background. It waits for a feed from CouchDB via the "newproc0" filter. When a new document shows up in 'datadb' with 'status == closed', the callback function in "pollProc0.py" is called. The callback function is "runProc0.py". This script grabs the results from the "proc0" mapReduce view (line 33) and for each data file it:
+a. updates "status = "proc 0 in progress" (line 39)
+
+
+
+
+Final Comments
+--------------
 
 
