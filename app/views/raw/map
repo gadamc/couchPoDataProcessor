@@ -1,0 +1,5 @@
+function(doc) {
+    if(doc && doc.type == "daqdocument" && doc.status == "good" && doc.proc1){
+	emit( doc.run_name, 1);
+    }
+}

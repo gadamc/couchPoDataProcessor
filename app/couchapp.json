@@ -1,0 +1,1 @@
+{"name": "Couch Podata Processor", "description": "A framework for using CouchDB as tool for driving the processing of data files by storing the meta-data for those files in CouchDB and then updatign the meta-data to reflect the current status of the processing chain."}

@@ -1,0 +1,7 @@
+function(doc, req) {
+ if (doc.status == "good") {
+ return true;
+ } else {
+ return false;
+ }
+}

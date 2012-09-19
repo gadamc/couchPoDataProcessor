@@ -1,0 +1,6 @@
+function(doc) {
+	
+    if(doc.type == "daqdocument" && doc["status"].indexOf("in progress") != -1){
+	emit( [doc.run_name, doc.file_number], doc.status);
+    }
+}

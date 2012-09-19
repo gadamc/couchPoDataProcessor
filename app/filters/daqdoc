@@ -1,0 +1,7 @@
+function(doc, req) {
+ if (doc.type && doc.type == "daqdocument") {
+ return true;
+ } else {
+ return false;
+ }
+}
