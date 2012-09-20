@@ -95,4 +95,7 @@ Final Comments
 
 I think it would be extremely useful if this data processing tool framework could be built to run in a "distributed" mode in the way its already done here. That is, you could connect up multiple databases / computing systems to work together to process your data. That sounds more complicated, but I think you would have to consider this feature very early on in the design of the framework in order to ever implement it. I would think that if you first create a framework that just runs on a single computing system it would be more difficult to add in this distributed feature later.
 
+I think that to make it really modular and distributed would be to have a separate instance of the code (essentially a completely new implementation) for each step in the processing chain. That is, the framework is built to handle just one step in the processing chain. Then if you need multiple steps, you just build multiple implementations based on the framework in separate code directories.
+
+I think this is easier and more robust than trying to build a framework / project that can handle steps on different systems and databases, etc... This would be the irreducible unit of the system. From there, I could imagine another tool to organize them all and distribute them to the various computers you need to run them on.
 
