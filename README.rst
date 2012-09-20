@@ -33,12 +33,23 @@ The entire process is driven by the existence and values of particular keywords 
 
 The value of "status" can be "closed", "good", "bad", "proc X queued", "proc X in progress" or "failed". The meaning of these values are
 
-:closed: the DAQ system (or equivalent script) has closed the data file and is ready for processing
-:good: the data file is ready for the next step in the processing chain
-:bad: something bad happened
-:proc X queued: the process has queued in the batch system in Lyon and is waiting
-:proc X in progress: the process is running 
-:failed: a process failed
+closed 
+	the DAQ system (or equivalent script) has closed the data file and is ready for processing
+
+good 
+	the data file is ready for the next step in the processing chain
+
+bad 
+	something bad happened
+
+proc X queued
+	 the process has queued in the batch system in Lyon and is waiting
+
+proc X in progress 
+	the process is running 
+
+failed 
+	a process failed
 
 Each "procX" keyword contains useful information regarding each process, such as the script or program that was called, the batch process job number if it was called on the batch system, the date / time, the computing node on which the process ran, and the full path of the output data file.
 
