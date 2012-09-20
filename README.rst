@@ -32,6 +32,7 @@ MetaData Doc KeyWords
 The entire process is driven by the existence and values of particular keywords in the CouchDB docs. These keywords are "status" and "procX" where X = 0, 1, 2, ...  Additionally, there is a "batchjob" keyword that is attached to the docs to record useful information regarding the submission of batch jobs for that data, such as the process that was run, the batch job number, the location of the standard Out and standard Err from the batch job, and date / time. 
 
 The value of "status" can be "closed", "good", "bad", "proc X queued", "proc X in progress" or "failed". The meaning of these values are
+
 :closed: the DAQ system (or equivalent script) has closed the data file and is ready for processing
 :good: the data file is ready for the next step in the processing chain
 :bad: something bad happened
